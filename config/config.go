@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"github.com/zahirsis/dev-portal-backend/src/pkg/logger"
 	"os"
 	"strconv"
@@ -186,6 +187,7 @@ func New() *Config {
 }
 
 func loadConfigFromEnv() *Config {
+	godotenv.Load(".env")
 	return &Config{
 		LogLevel: getEnumEnvWithDefault[logger.LogLevel]("LOGLEVEL", logger.Error, logger.LogLevelFromString),
 		Http: &httpConfig{
