@@ -62,6 +62,7 @@ type WikiServiceData struct {
 	GitOpsUrl       string
 	ConfigMapUrl    string
 	Template        string
+	ServiceWikiLink string
 }
 
 type WikiPagesData struct {
@@ -82,6 +83,7 @@ func (g *wikiService) SetupWiki(wiki entity.WikiEntity, templatesPath string) ([
 		ConfigMapUrl:    data.ConfigMapPath,
 		Template:        wiki.Data().Template().Label(),
 		RegistryUrl:     data.RegistryUrl,
+		ServiceWikiLink: "",
 	}
 	c, err := g.ds.LoadTemplate(fmt.Sprintf("%s/%s", templatesPath, wiki.Config().TemplateServicePath), wsd, true)
 	if err != nil {

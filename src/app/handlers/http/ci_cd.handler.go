@@ -11,20 +11,33 @@ import (
 
 type CiCdHandler struct {
 	*container.Container
-	setupUseCase usecase.SetupCiCdUseCase
+	setupUseCase   usecase.SetupCiCdUseCase
+	getDataUseCase usecase.GetCiCdDataUseCase
 }
 
 func NewCiCdHandler(
 	c *container.Container,
 	r interfaces.Router,
 	suc usecase.SetupCiCdUseCase,
+	guc usecase.GetCiCdDataUseCase,
 ) *CiCdHandler {
 	h := &CiCdHandler{
 		c,
 		suc,
+		guc,
 	}
 	r.POST("setup", h.Setup)
+	r.GET("data", h.GetData)
 	return h
+}
+
+func (th *CiCdHandler) GetData(c interfaces.HttpServerContext) {
+	out, err := th.getDataUseCase.Exec()
+	if err != nil {
+		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"status": "success", "data": out})
 }
 
 func (th *CiCdHandler) Setup(c interfaces.HttpServerContext) {

@@ -226,7 +226,7 @@ func (g *gitOpsService) SetupGitOpsManifests(e entity.GitOpsEntity, templatesPat
 		Project:                               env.Env().Project(),
 		K8sApplicationPath:                    e.Config().K8sApplicationDestinationPath,
 		GitOpsRepository:                      g.config.SetupCiCd.GitOpsRepository,
-		ConfigMapPath:                         e.Config().K8sConfigMapTemplatesPath,
+		ConfigMapPath:                         e.Config().K8sConfigMapDestinationPath,
 		ConfigMapRepository:                   g.config.SetupCiCd.ConfigMapRepository,
 	}
 	if err := g.setupGitOpsBaseManifests(data); err != nil {

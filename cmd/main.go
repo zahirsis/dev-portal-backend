@@ -160,7 +160,8 @@ func main() {
 
 	// CI/CD
 	cuc := usecase.NewSetupCiCdUseCase(c, cfg)
-	httpHandler.NewCiCdHandler(c, apiGroup.Group("ci-cd"), cuc)
+	guc := usecase.NewGetCiCdDataUseCase(cfg)
+	httpHandler.NewCiCdHandler(c, apiGroup.Group("ci-cd"), cuc, guc)
 	puc := usecase.NewProgressUseCase(c)
 	websocketHandler.NewCiCdHandler(c, apiGroup.Group("ci-cd"), upgrader, puc)
 
