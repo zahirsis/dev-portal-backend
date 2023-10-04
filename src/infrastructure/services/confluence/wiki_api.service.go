@@ -3,6 +3,7 @@ package confluence
 import (
 	"fmt"
 	"github.com/zahirsis/dev-portal-backend/config"
+	confluenceapiv2 "github.com/zahirsis/dev-portal-backend/pkg/confluence-api-v2"
 	"github.com/zahirsis/dev-portal-backend/src/domain/service"
 	"github.com/zahirsis/dev-portal-backend/src/pkg/logger"
 	"net/url"
