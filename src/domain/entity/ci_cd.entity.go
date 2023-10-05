@@ -170,7 +170,11 @@ func (s *setupCiCdEntity) IngressStripPath() bool {
 	if s.template.IngressDefault().Frontend {
 		return false
 	}
-	return strings.Trim(s.ingress.CustomPath, "/") != strings.Trim(s.application.RootPath, "/")
+	parts := strings.Split(strings.Trim(s.application.RootPath, "/"), "/")
+	if len(parts) > 0 && parts[0] == strings.Trim(s.ingress.CustomPath, "/") {
+		return false
+	}
+	return true
 }
 
 func (s *setupCiCdEntity) IngressHost(env string) string {

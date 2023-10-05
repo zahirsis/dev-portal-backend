@@ -124,6 +124,7 @@ type ApplicationData struct {
 	DefaultImageTag                     string
 	ApplicationMinReplicas              int
 	ApplicationMaxReplicas              int
+	EnvironmentMountPath                string
 }
 
 func (g *gitOpsService) SetupK8sManifests(e entity.GitOpsEntity, templatesPath, gitOpsPath, cmPath string) ([]string, error) {
@@ -158,6 +159,7 @@ func (g *gitOpsService) SetupK8sManifests(e entity.GitOpsEntity, templatesPath, 
 		data.IngressPath = e.Data().IngressPath(env.Env().Code())
 		data.ApplicationMinReplicas = env.ReplicasMin()
 		data.ApplicationMaxReplicas = env.ReplicasMax()
+		data.EnvironmentMountPath = env.Env().SecretsPath()
 		if err := g.directoryService.ApplyTemplateRecursively(gitOpsPath+"/overlays/"+env.Env().Code(), data); err != nil {
 			return []string{}, err
 		}
