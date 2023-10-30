@@ -39,3 +39,4 @@ _testmain.go
 
 # Temporary files
 /tmp
+.DS_Store

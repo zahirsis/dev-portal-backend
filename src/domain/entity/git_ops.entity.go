@@ -16,9 +16,10 @@ type GitOpsConfig struct {
 	K8sConfigMapTemplatesPath   string `json:"k8sConfigMapTemplatesPath" yaml:"k8sConfigMapTemplatesPath"`
 	K8sConfigMapDestinationPath string `json:"k8sConfigMapDestinationPath" yaml:"k8sConfigMapDestinationPath"`
 	// Apps Base Templates
-	GitOpsKustomizationTemplatePath string `json:"gitOpsKustomizationTemplatePath" yaml:"gitOpsKustomizationTemplatePath"`
-	GitOpsAppTemplatesPath          string `json:"gitOpsAppTemplatesPath" yaml:"gitOpsAppTemplatesPath"`
-	GitOpsBaseDestinationPath       string `json:"gitOpsBaseDestinationPath" yaml:"gitOpsBaseDestinationPath"`
+	GitOpsKustomizationTemplatePath          string `json:"gitOpsKustomizationTemplatePath" yaml:"gitOpsKustomizationTemplatePath"`
+	GitOpsAppTemplatesPath                   string `json:"gitOpsAppTemplatesPath" yaml:"gitOpsAppTemplatesPath"`
+	GitOpsAppNamespaceUtilitiesTemplatesPath string `json:"gitOpsAppNamespaceUtilitiesTemplatesPath" yaml:"gitOpsAppNamespaceUtilitiesTemplatesPath"`
+	GitOpsBaseDestinationPath                string `json:"gitOpsBaseDestinationPath" yaml:"gitOpsBaseDestinationPath"`
 }
 
 type GitOpsEntity interface {

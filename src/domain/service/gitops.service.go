@@ -178,7 +178,7 @@ func (g *gitOpsService) SetupK8sManifests(e entity.GitOpsEntity, templatesPath, 
 		if err := g.directoryService.CreateDirectory(fmt.Sprintf("%s/%s", cmPath, e.Config().K8sConfigMapDestinationPath)); err != nil {
 			return []string{}, err
 		}
-		if err := g.directoryService.CopyDirectory(cmTemplatesPath, fmt.Sprintf("%s/%s/%s", cmPath, e.Config().K8sConfigMapDestinationPath, env.Env().Code())); err != nil {
+		if err := g.directoryService.CopyDirectory(cmTemplatesPath+"/overlay", fmt.Sprintf("%s/%s/%s", cmPath, e.Config().K8sConfigMapDestinationPath, env.Env().Code())); err != nil {
 			return []string{}, err
 		}
 		if err := g.directoryService.ApplyTemplateRecursively(fmt.Sprintf("%s/%s/%s", cmPath, e.Config().K8sConfigMapDestinationPath, env.Env().Code()), data); err != nil {
@@ -191,8 +191,11 @@ func (g *gitOpsService) SetupK8sManifests(e entity.GitOpsEntity, templatesPath, 
 type GitOpsManifestsData struct {
 	templateKustomizationPath             string
 	templateAppPath                       string
+	templateNamespaceUtilitiesPath        string
 	baseKustomizationDestinationPath      string
 	namespaceKustomizationDestinationPath string
+	namespaceUtilitiesDestinationPath     string
+	namespaceUtilitiesFileName            string
 	appDestinationPath                    string
 	Namespace                             string
 	ApplicationName                       string
@@ -200,6 +203,8 @@ type GitOpsManifestsData struct {
 	DestinationCluster                    string
 	Project                               string
 	K8sApplicationPath                    string
+	K8sNamespaceUtilitiesPath             string
+	GitOpsToolsRepository                 string
 	GitOpsRepository                      string
 	ConfigMapPath                         string
 	ConfigMapRepository                   string
@@ -218,8 +223,10 @@ func (g *gitOpsService) SetupGitOpsManifests(e entity.GitOpsEntity, templatesPat
 	data := &GitOpsManifestsData{
 		templateKustomizationPath:             templatesPath + "/" + e.Config().GitOpsKustomizationTemplatePath,
 		templateAppPath:                       templatesPath + "/" + e.Config().GitOpsAppTemplatesPath,
+		templateNamespaceUtilitiesPath:        templatesPath + "/" + e.Config().GitOpsAppNamespaceUtilitiesTemplatesPath,
 		baseKustomizationDestinationPath:      gitOpsBaseDestinationPath + "/kustomization.yaml",
 		namespaceKustomizationDestinationPath: gitOpsNamespaceDestinationPath + "/kustomization.yaml",
+		namespaceUtilitiesDestinationPath:     gitOpsNamespaceDestinationPath + "/_base.yaml",
 		appDestinationPath:                    gitOpsNamespaceDestinationPath + "/" + e.Data().ApplicationSlug() + ".yaml",
 		Namespace:                             e.Data().Squad().Code(),
 		ApplicationName:                       e.Data().ApplicationSlug(),
@@ -227,8 +234,10 @@ func (g *gitOpsService) SetupGitOpsManifests(e entity.GitOpsEntity, templatesPat
 		DestinationCluster:                    env.Env().DestinationCluster(),
 		Project:                               env.Env().Project(),
 		K8sApplicationPath:                    e.Config().K8sApplicationDestinationPath,
+		K8sNamespaceUtilitiesPath:             e.Config().K8sNamespaceUtilitiesDestinationPath,
 		GitOpsRepository:                      g.config.SetupCiCd.GitOpsRepository,
-		ConfigMapPath:                         e.Config().K8sConfigMapDestinationPath,
+		GitOpsToolsRepository:                 g.config.SetupCiCd.GitOpsToolsRepository,
+		ConfigMapPath:                         fmt.Sprintf("%s/%s", e.Config().K8sConfigMapDestinationPath, env.Env().Code()),
 		ConfigMapRepository:                   g.config.SetupCiCd.ConfigMapRepository,
 	}
 	if err := g.setupGitOpsBaseManifests(data); err != nil {
@@ -262,10 +271,24 @@ func (g *gitOpsService) setupGitOpsNamespaceManifests(data *GitOpsManifestsData)
 			return err
 		}
 	}
-	return g.directoryService.VerifyOrInsertLineInFile(
+	if err := g.directoryService.VerifyOrInsertLineInFile(data.namespaceKustomizationDestinationPath, "- _base.yaml"); err != nil {
+		return err
+	}
+	err := g.directoryService.VerifyOrInsertLineInFile(
 		data.namespaceKustomizationDestinationPath,
 		fmt.Sprintf("- %s.yaml", data.ApplicationName),
 	)
+	if err != nil {
+		return err
+	}
+	if exists, err := g.directoryService.DirectoryExists(data.namespaceUtilitiesDestinationPath); err != nil {
+		return err
+	} else if !exists {
+		if err := g.directoryService.CopyDirectory(data.templateNamespaceUtilitiesPath, data.namespaceUtilitiesDestinationPath); err != nil {
+			return err
+		}
+	}
+	return g.directoryService.ApplyTemplate(data.namespaceUtilitiesDestinationPath, data)
 }
 
 func (g *gitOpsService) setupGitOpsApplicationManifests(data *GitOpsManifestsData) error {

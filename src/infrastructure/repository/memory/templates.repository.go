@@ -33,7 +33,7 @@ func (r *templateRepository) Get(code string) (entity.TemplateEntity, error) {
 }
 
 func (r *templateRepository) memory() []entity.TemplateEntity {
-	manifests := []*entity.Manifest{
+	m := []*entity.Manifest{
 		{
 			Code:  "aws-ecr",
 			Label: "Aws ECR",
@@ -45,13 +45,20 @@ func (r *templateRepository) memory() []entity.TemplateEntity {
 			Label: "Argo manifests",
 			Type:  entity.GitOpsManifests,
 			Dir:   "manifests/git-ops/argo-cd",
-		}, {
-			Code:  "bitbucket-pipelines",
-			Label: "Bitbucket pipelines",
-			Type:  entity.PipelineManifests,
-			Dir:   "manifests/pipeline/bitbucket-pipelines/spring-boot",
 		},
 	}
+	msb := append(m, &entity.Manifest{
+		Code:  "bitbucket-pipelines",
+		Label: "Bitbucket pipelines",
+		Type:  entity.PipelineManifests,
+		Dir:   "manifests/pipeline/bitbucket-pipelines/spring-boot",
+	})
+	mrj := append(m, &entity.Manifest{
+		Code:  "bitbucket-pipelines",
+		Label: "Bitbucket pipelines",
+		Type:  entity.PipelineManifests,
+		Dir:   "manifests/pipeline/bitbucket-pipelines/react-js",
+	})
 	return []entity.TemplateEntity{
 		entity.NewTemplateEntity("spring-boot", "SpringBoot", entity.ApplicationObject{
 			RootPath: entity.PathObject{
@@ -107,7 +114,7 @@ func (r *templateRepository) memory() []entity.TemplateEntity {
 			Authentication: true,
 			Frontend:       false,
 			Enabled:        true,
-		}, manifests),
+		}, msb),
 		entity.NewTemplateEntity("react-js", "ReactJs", entity.ApplicationObject{
 			RootPath: entity.PathObject{
 				Default:      "/",
@@ -120,16 +127,16 @@ func (r *templateRepository) memory() []entity.TemplateEntity {
 			Port: 3000,
 			Memory: entity.ResourceObject{
 				Min: entity.NumberValueObject{
-					Value: 256,
-					Step:  128,
-					Min:   128,
-					Max:   2048,
+					Value: 64,
+					Step:  64,
+					Min:   64,
+					Max:   512,
 				},
 				Max: entity.NumberValueObject{
-					Value: 512,
-					Step:  128,
-					Min:   128,
-					Max:   4096,
+					Value: 128,
+					Step:  64,
+					Min:   64,
+					Max:   1024,
 				},
 			},
 			Cpu: entity.ResourceObject{
@@ -137,13 +144,13 @@ func (r *templateRepository) memory() []entity.TemplateEntity {
 					Value: 0.01,
 					Step:  0.01,
 					Min:   0.01,
-					Max:   1,
+					Max:   0.5,
 				},
 				Max: entity.NumberValueObject{
 					Value: 0.1,
-					Step:  0.1,
+					Step:  0.01,
 					Min:   0.1,
-					Max:   2,
+					Max:   1,
 				},
 			},
 		}, entity.IngressObject{
@@ -155,12 +162,12 @@ func (r *templateRepository) memory() []entity.TemplateEntity {
 			Path: entity.PathObject{
 				Fixed:        "/",
 				Default:      "",
-				Customizable: true,
+				Customizable: false,
 			},
 			Authentication: false,
 			Frontend:       true,
 			Enabled:        true,
-		}, manifests),
+		}, mrj),
 		//entity.NewTemplateEntity("node-js", "Node.Js", entity.ApplicationObject{
 		//	RootPath:        entity.PathObject{},
 		//	HealthCheckPath: entity.PathObject{},
