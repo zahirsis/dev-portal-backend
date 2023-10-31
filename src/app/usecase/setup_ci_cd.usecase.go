@@ -776,7 +776,7 @@ func (uc *setupCiCdUseCase) makePr(data pullRequestData, commit bool) (string, e
 		uc.updateProgressError(data.pd, err, fmt.Sprintf("Error checking changes on %s", data.localDir))
 		return "", err
 	}
-	if !hasChanges {
+	if !hasChanges && commit {
 		uc.updateProgress(data.pd, fmt.Sprintf("No changes on %s", data.localDir))
 		return "", nil
 	}

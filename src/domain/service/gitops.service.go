@@ -179,7 +179,7 @@ func (g *gitOpsService) SetupK8sManifests(e entity.GitOpsEntity, templatesPath, 
 		if err := g.directoryService.CreateDirectory(fmt.Sprintf("%s/%s", cmPath, e.Config().K8sConfigMapDestinationPath)); err != nil {
 			return []string{}, err
 		}
-		if err := g.directoryService.CopyDirectory(cmTemplatesPath, fmt.Sprintf("%s/%s/%s", cmPath, e.Config().K8sConfigMapDestinationPath, env.Env().Code())); err != nil {
+		if err := g.directoryService.CopyDirectory(cmTemplatesPath+"/overlay", fmt.Sprintf("%s/%s/%s", cmPath, e.Config().K8sConfigMapDestinationPath, env.Env().Code())); err != nil {
 			return []string{}, err
 		}
 		if err := g.directoryService.ApplyTemplateRecursively(fmt.Sprintf("%s/%s/%s", cmPath, e.Config().K8sConfigMapDestinationPath, env.Env().Code()), data); err != nil {
@@ -238,7 +238,7 @@ func (g *gitOpsService) SetupGitOpsManifests(e entity.GitOpsEntity, templatesPat
 		K8sNamespaceUtilitiesPath:             e.Config().K8sNamespaceUtilitiesDestinationPath + "/overlays/" + env.Env().Code(),
 		GitOpsRepository:                      g.config.SetupCiCd.GitOpsRepository,
 		GitOpsToolsRepository:                 g.config.SetupCiCd.GitOpsToolsRepository,
-		ConfigMapPath:                         e.Config().K8sConfigMapDestinationPath,
+		ConfigMapPath:                         e.Config().K8sConfigMapDestinationPath + "/" + env.Env().Code(),
 		ConfigMapRepository:                   g.config.SetupCiCd.ConfigMapRepository,
 	}
 	if err := g.setupGitOpsBaseManifests(data); err != nil {
