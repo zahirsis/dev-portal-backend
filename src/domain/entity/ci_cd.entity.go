@@ -6,9 +6,10 @@ import (
 )
 
 type EnvironmentCreatedData struct {
-	Label string
-	Code  string
-	Url   string
+	Label           string
+	Code            string
+	Url             string
+	ApplicationName string
 }
 
 type CreatedData struct {
