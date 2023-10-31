@@ -8,6 +8,7 @@ import (
 	"github.com/zahirsis/dev-portal-backend/src/domain/service"
 	"github.com/zahirsis/dev-portal-backend/src/pkg/logger"
 	"os/exec"
+	"strings"
 )
 
 type gitService struct {
@@ -42,9 +43,17 @@ func (g *gitService) Branch(path string, branch string) error {
 }
 
 func (g *gitService) Commit(path string, message string) error {
+	hasChanges, err := g.HasChanges(path)
+	if err != nil {
+		return err
+	}
+	if !hasChanges {
+		g.logger.Debug("No changes to commit, skipping...")
+		return nil
+	}
 	cmd := exec.Command("git", "add", ".")
 	cmd.Dir = path
-	err := g.execCommand(cmd, fmt.Sprintf("adding files to stage"))
+	err = g.execCommand(cmd, fmt.Sprintf("adding files to stage"))
 	if err != nil {
 		return err
 	}
@@ -82,6 +91,18 @@ func (g *gitService) execCommand(cmd *exec.Cmd, action string) error {
 		return errors.New(fmt.Sprintf("%s: \n%s\n%s", action, errMessage, err.Error()))
 	}
 	return nil
+}
+
+func (g *gitService) HasChanges(path string) (bool, error) {
+	cmd := exec.Command("git", "status", "--porcelain")
+	cmd.Dir = path
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		g.logger.Error("Error getting git status", err.Error())
+		return false, err
+	}
+	statusOutput := strings.TrimSpace(string(output))
+	return statusOutput != "", nil
 }
 
 func configGit(logger logger.Logger) {
