@@ -7,4 +7,5 @@ type GitService interface {
 	Commit(path string, message string) error
 	Push(path string, branch string) error
 	Pull(path string, branch string) error
+	HasChanges(path string) (bool, error)
 }

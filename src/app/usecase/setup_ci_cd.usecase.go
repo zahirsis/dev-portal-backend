@@ -771,7 +771,8 @@ type pullRequestData struct {
 }
 
 func (uc *setupCiCdUseCase) makePr(data pullRequestData, commit bool) (string, error) {
-	if commit {
+	hasChanges, err := uc.Services.GitService.HasChanges(data.localDir)
+	if commit && hasChanges {
 		uc.updateProgress(data.pd, fmt.Sprintf("Committing changes on %s", data.localDir))
 		if err := uc.Services.GitService.Commit(data.localDir, data.message); err != nil {
 			uc.updateProgressError(data.pd, err, fmt.Sprintf("Error committing changes on %s", data.localDir))
