@@ -181,7 +181,7 @@ func (s *setupCiCdEntity) IngressStripPath() bool {
 func (s *setupCiCdEntity) IngressHost(env string) string {
 	var host string
 	if s.IngressCustomHost() != "" {
-		host = s.IngressCustomHost() + "/"
+		host = s.IngressCustomHost()
 	}
 	host += strings.Trim(s.Template().IngressDefault().Host.Fixed, "/")
 	return s.replaceCommonValues(host, env)

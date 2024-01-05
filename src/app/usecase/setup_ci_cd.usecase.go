@@ -448,7 +448,7 @@ func (uc *setupCiCdUseCase) createK8sManifests(pd *processData, gm []*entity.Man
 				return []string{}, err
 			}
 		}
-		pd.data.CreatedData().ConfigMapPath = uc.config.GitConfig.GetRepositoryUrl(prd.repository) + "/" + ge.Config().K8sConfigMapDestinationPath
+		pd.data.CreatedData().ConfigMapPath = uc.config.GitConfig.GetRepositoryUrl(prd.repository) + "/src/" + pd.configMapBranch + "/" + ge.Config().K8sConfigMapDestinationPath
 
 		data.Type = "success"
 		uc.updateProgress(data, fmt.Sprintf("%s's manifests created for %s's service", m.Code, pd.data.ApplicationSlug()))
@@ -555,7 +555,7 @@ func (uc *setupCiCdUseCase) createPipeline(pd *processData, pm []*entity.Manifes
 			}
 			variables := uc.getRepositoryVariables(pe.Config().Environments[e.Env().Code()].Variables)
 			environments = append(environments, &service.PipelineEnvironment{
-				Name:      e.Env().Code(),
+				Name:      pe.Config().Environments[e.Env().Code()].Triggers[0].Deployment,
 				Variables: variables,
 			})
 		}
